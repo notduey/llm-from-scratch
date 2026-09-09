@@ -1,0 +1,20 @@
+# Python virtual environment
+.venv/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+
+# IDE/editor files
+.vscode/
+.idea/
+
+# Operating system files
+.DS_Store
+
+# Training artifacts
+checkpoints/
+models/
+
+# Logs
+logs/
