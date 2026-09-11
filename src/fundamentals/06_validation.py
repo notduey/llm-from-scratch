@@ -104,12 +104,12 @@ plot_prediction = plot_prediction.numpy()
 # Actual y = x^2 function
 true_y = plot_x ** 2
 
-plt.plot(plot_x, true_y, label="True: y = x²")
+plt.plot(plot_x, true_y, label="True: y = x^2")
 plt.plot(plot_x, plot_prediction, label="Model prediction")
 
 plt.xlabel("x")
 plt.ylabel("y")
-plt.title("Neural Network Approximation of y = x²")
+plt.title("Neural Network Approximation of y = x^2")
 plt.legend()
 
 plt.show()
