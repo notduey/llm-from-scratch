@@ -10,9 +10,22 @@ class ModelConfig:
     vocab_size: int
     d_model: int
     num_heads: int
+    d_ff: int
 
     # Validate config after dataclass initialization
-    def __post_init__(self):
+    def __post_init__(self) -> None:
+        if self.vocab_size <= 0:
+            raise ValueError("vocab_size must be positive")
+
+        if self.d_model <= 0:
+            raise ValueError("d_model must be positive")
+
+        if self.num_heads <= 0:
+            raise ValueError("num_heads must be positive")
+
+        if self.d_ff <= 0:
+            raise ValueError("d_ff must be positive")
+
         if self.d_model % self.num_heads != 0:
             raise ValueError(
                 "d_model must be divisible by num_heads"
@@ -25,5 +38,5 @@ class ModelConfig:
 
     # Derived properties
     @property
-    def head_dim(self):
+    def head_dim(self) -> int:
         return self.d_model // self.num_heads

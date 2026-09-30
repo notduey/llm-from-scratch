@@ -7,8 +7,13 @@ from .config import ModelConfig
 
 # TODO: Precompute/cache RoPE values and causal mask, once max context length is configured.
 
-# build the RoPE angles
-def build_rope_angles(sequence_length, head_dim, device, base=10000):
+# Build RoPE angle values
+def build_rope_angles(
+    sequence_length: int,
+    head_dim: int,
+    device: torch.device,
+    base: float = 10000.0
+) -> tuple[torch.Tensor, torch.Tensor]: # cosine, sine
     pair_indices = torch.arange(
         0,
         head_dim,
@@ -35,7 +40,11 @@ def build_rope_angles(sequence_length, head_dim, device, base=10000):
     return torch.cos(angles), torch.sin(angles)
 
 # Apply the rotations
-def apply_rope(x, cos, sin):
+def apply_rope(
+    x: torch.Tensor,
+    cos: torch.Tensor,
+    sin: torch.Tensor
+) -> torch.Tensor:
     # Split into even and odd indices
     
     x_even = x[..., 0::2]
@@ -68,7 +77,7 @@ class CausalSelfAttention(nn.Module):
     """
     Multi-head causal self-attention with rotary positional embeddings.
     """
-    def __init__(self, config: ModelConfig):
+    def __init__(self, config: ModelConfig) -> None:
         super().__init__() # call parent constructor
 
         self.d_model = config.d_model
@@ -87,7 +96,7 @@ class CausalSelfAttention(nn.Module):
             bias=False
         )
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         _, sequence_length, _ = x.shape # only need second dim
 
         qkv = self.qkv_proj(x)
@@ -132,7 +141,7 @@ class CausalSelfAttention(nn.Module):
         # Weighted sum of V
         head_outputs = attention_weights @ v
 
-        # Concatenate heads
+        # Recombine heads
         combined = self._combine_heads(head_outputs)
 
         # Mix information across heads with output projection
@@ -141,7 +150,7 @@ class CausalSelfAttention(nn.Module):
         return output
 
     # helper that splits matrix representation across heads
-    def _split_heads(self, x):
+    def _split_heads(self, x: torch.Tensor) -> torch.Tensor:
         batch_size, sequence_length, _ = x.shape
 
         x = x.view(
@@ -153,8 +162,8 @@ class CausalSelfAttention(nn.Module):
 
         return x.transpose(1, 2) # transpose to [B, H, T, d_head]
 
-    # helper that concatenates the heads
-    def _combine_heads(self, x):
+    # helper that recombines the heads
+def _combine_heads(self, x: torch.Tensor) -> torch.Tensor:
         batch_size, _, sequence_length, _ = x.shape
 
         x = x.transpose(1, 2) # transpose back to [B, T, H, d_head]
