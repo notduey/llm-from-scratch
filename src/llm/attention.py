@@ -163,7 +163,7 @@ class CausalSelfAttention(nn.Module):
         return x.transpose(1, 2) # transpose to [B, H, T, d_head]
 
     # helper that recombines the heads
-def _combine_heads(self, x: torch.Tensor) -> torch.Tensor:
+    def _combine_heads(self, x: torch.Tensor) -> torch.Tensor:
         batch_size, _, sequence_length, _ = x.shape
 
         x = x.transpose(1, 2) # transpose back to [B, T, H, d_head]
